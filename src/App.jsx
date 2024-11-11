@@ -2,9 +2,10 @@ import './App.css';
 import RecipeTitle from "./RecipeTitle";
 import IngredientList from "./ IngredientList";
 import StepsList from"./StepsList";
+import React, { useEffect, useState } from 'react';
 
 function App() {
-  const recipe = {
+  const initialRecipe = {
       title: "Mashed potatoes",
       feedback: {
           rating: 4.8,
@@ -14,8 +15,8 @@ function App() {
           { name: '3 potatoes, cut into 1/2" pieces', prepared: true },
           { name: '4 Tbsp butter', prepared: true },
           { name: '1/8 cup heavy cream', prepared: true },
-          { name: 'Salt', prepared: true },
-          { name: 'Pepper', prepared: true },
+          { name: 'Salt', prepared: false },
+          { name: 'Pepper', prepared: false },
       ],
       steps:[
           {name:'Add cut potatoes to a pot of heavily salted water.'},
@@ -29,13 +30,27 @@ function App() {
       ],
   };
 
+    const [ recipe, setRecipe ] = useState(initialRecipe);
+
+    const [ prepared, setPrepared ] = useState(false);
+
+    function ingredientClick(index) {
+        const updatedRecipe = { ... recipe };
+        updatedRecipe.ingredients[index].prepared = !updatedRecipe.ingredients[index].prepared;
+        setRecipe(updatedRecipe);
+    }
+
+    useEffect(() => {
+        setPrepared(recipe.ingredients.every(i => i.prepared));
+    }, [recipe]);
 
     return (
       <article>
         <h1>Recipe Manager</h1>
           <RecipeTitle title = {recipe.title} feedback={recipe.feedback} />
-          <IngredientList ingredients={recipe.ingredients} />
+          <IngredientList ingredients={recipe.ingredients} onClick={ ingredientClick } />
           {<StepsList steps = {recipe.steps}/>}
+          { prepared ? <h2>Prep work done!</h2> : <h2>Just keep chopping.</h2>}
       </article>
 
   );
